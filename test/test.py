@@ -14,7 +14,7 @@ async def setChannelFunction(dut, channel, func):
 
 async def reset(dut):
     # Reset
-    dut._log.info("Reset")
+    dut._log.info("~Reset~")
     dut.ena.value = 1
     dut.ui_in.value = 0
     dut.uio_in.value = 0
@@ -30,7 +30,7 @@ async def test_project(dut):
     clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
 
-    reset(dut)
+    await reset(dut)
 
     dut._log.info("Test project behavior")
 
@@ -43,7 +43,7 @@ async def test_project(dut):
 
     # The following assersion is just an example of how to check the output values.
     # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 0
+    assert dut.uo_out.value == 0b01100101
 
     # Keep testing the module by changing the input values, waiting for
     # one or more clock cycles, and asserting the expected output values.
@@ -58,6 +58,30 @@ async def testChannel(dut):
 
     reset(dut)
 
+# @cocotb.test()
+async def testReset(dut):
+    dut._log.info(f"Testing rst_n")
+    dut._log.info(f"{dut.rst_n.value=}")
+
+    clock = Clock(dut.clk, 10, unit='us')
+    cocotb.start_soon(clock.start())
+
+    await reset(dut)
+
+    dut._log.info(f"Initiating 1 clock cycle")
+    await ClockCycles(dut.clk, 1)
+    
+    dut._log.info(f"Initiating 1 reset cycle")
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 1)
+    assert dut.rst_n.value == 0
+    
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+    assert dut.rst_n.value == 1
+    
+    dut._log.info(f"Finished reset")
+
 @cocotb.test()
 async def testAND(dut):
     channel = 0
@@ -66,9 +90,11 @@ async def testAND(dut):
     clock = Clock(dut.clk, 10, unit='us')
     cocotb.start_soon(clock.start())
 
-    reset(dut)
+    await reset(dut)
 
     await ClockCycles(dut.clk, 1)
+    
+    setChannelFunction(dut, channel, "AND")
 
     # Input incrementer
     for check_and in range(4):

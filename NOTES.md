@@ -5,6 +5,7 @@
 
 ## Testing
 * Remember to pulse a single clock cycle to "unreset" the chip
+* Remember to `await` the `reset(dut)` function (doesnt properly reset the chip otherwise)
 
 ## MVP
 * Functions as a flexible 4-channel logic gate chip
@@ -28,7 +29,7 @@
 ## In Progress
 - [x] Setup a test bench function for a single channel and single gate type
 - [ ] (Test) Change channel function test to test all gate functions
-- [ ] (Bug) Figure out why `test_project` test needs to run for `testAND` to pass?
+- [x] (Bug) Figure out why `test_project` test needs to run for `testAND` to pass?
 - [ ] (Test) Create test case list
 - [ ] (Docs) Update README
 - [ ] (Test) Remove the default test case when no longer needed
