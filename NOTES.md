@@ -11,19 +11,17 @@
 * Functions as a flexible 4-channel logic gate chip
 * Each channel is individually configurable with a dedicated output enable
 * Channel functions include:
-    * Invert (invert from A input)
     * AND
     * OR
-    * NAND
-    * NOR
     * XOR
-    * XNOR
 * Functions are cycled by signaling HIGH on the channel control pin while `clk` is HIGH
+* Outputs include Q and nQ
 
 # TODO
 
 ## CRITICAL
 - [x] Initial repo setup
+- [ ] (Test) Start using `ctypes` to make bitwise testing easier
 - [ ] (Feature) Control pin functionality
 
 ## In Progress
@@ -32,7 +30,9 @@
 - [x] (Bug) Figure out why `test_project` test needs to run for `testAND` to pass?
 - [ ] (Test) Create test case list
 - [ ] (Docs) Update README
-- [ ] (Test) Remove the default test case when no longer needed
+- [x] (Test) Remove the default test case when no longer needed
+- [ ] (Test) Make `setChannelFunctionFromReset()` adaptive (reads from chx_state)
+- [ ] (Test) Make a parallelized version of `setChannelFunctionFromReset()` (to set multiple channels at once simultaneously)
 
 ## Backlog
 - [ ] Generative channel block
