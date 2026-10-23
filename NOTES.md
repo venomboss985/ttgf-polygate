@@ -29,10 +29,10 @@
 - [ ] (Test) Change channel function test to test all gate functions
 - [x] (Bug) Figure out why `test_project` test needs to run for `testAND` to pass?
 - [ ] (Test) Create test case list
-- [ ] (Docs) Update README
 - [x] (Test) Remove the default test case when no longer needed
 - [ ] (Test) Make `setChannelFunctionFromReset()` adaptive (reads from chx_state)
 - [ ] (Test) Make a parallelized version of `setChannelFunctionFromReset()` (to set multiple channels at once simultaneously)
+- [ ] (Docs) Update README
 
 ## Backlog
 - [ ] Generative channel block
