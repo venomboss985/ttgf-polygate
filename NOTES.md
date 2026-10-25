@@ -21,8 +21,8 @@
 
 ## CRITICAL
 - [x] Initial repo setup
-- [ ] (Test) Start using `ctypes` to make bitwise testing easier
 - [ ] (Feature) Control pin functionality
+- [ ] (Feature) Channel output enable functionality
 
 ## In Progress
 - [x] Setup a test bench function for a single channel and single gate type
@@ -42,3 +42,4 @@
 ## Revisit
 
 ## Retired
+* `ctypes` not needed, just had to get better at bit-masking...

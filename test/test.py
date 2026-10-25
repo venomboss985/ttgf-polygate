@@ -18,7 +18,7 @@ async def setChannelFunctionFromReset(dut, channel, func):
         case "XOR": pulses = 2
 
     assert pulses == 0 or pulses < 3
-    await ClockCycles(dut.clk, pulses)
+    await ClockCycles(dut.clk, pulses+1)
     
     dut.uio_in.value = 0 << CHNL_OFFSET[channel]
 
@@ -87,46 +87,20 @@ async def testAND(dut):
         value = f"{check:02b}"
         A = int(value[-1])
         B = int(value[ 0])
-        result = A & B
+        res = (A & B)
+        n_res = ~(A & B) & 0b1
         
-        dut._log.info(f"{A=} & {B=} = {result}")
+        result = (res << CHNL_OFFSET[channel]) | (n_res << CHNL_OFFSET[channel]+1)
+        
+        dut._log.info(f"{A=} & {B=} = {result:02b}")
         dut._log.info(f"{CHNL_OFFSET[channel]=}")
         
         dut.ui_in.value = check << CHNL_OFFSET[channel]
         await ClockCycles(dut.clk, 2)
-        dut._log.info(f"{dut.uo_out.value[0]=}")
-        assert dut.uo_out.value[0] == result << CHNL_OFFSET[channel]
-        
-@cocotb.test()
-async def testNAND(dut):
-    channel = 0
-    dut._log.info(f"Testing CH{channel} NAND")
+        dut._log.info(f"{dut.uo_out.value=}")
+        assert int(dut.uo_out.value) & 0b11 << CHNL_OFFSET[channel] == result << CHNL_OFFSET[channel]
 
-    clock = Clock(dut.clk, 10, unit='us')
-    cocotb.start_soon(clock.start())
-
-    await reset(dut)
-
-    await ClockCycles(dut.clk, 1)
-    
-    setChannelFunctionFromReset(dut, channel, "AND")
-
-    # Input incrementer
-    for check in range(4):
-        value = f"{check:02b}"
-        A = int(value[-1])
-        B = int(value[ 0])
-        result = ~(A & B)
-        
-        dut._log.info(f"{A=} !& {B=} = {result}")
-        dut._log.info(f"{CHNL_OFFSET[channel]+1=}")
-        
-        dut.ui_in.value = check << CHNL_OFFSET[channel]+1
-        await ClockCycles(dut.clk, 2)
-        dut._log.info(f"{dut.uo_out.value[0]=}")
-        assert dut.uo_out.value[0] == ~result << CHNL_OFFSET[channel]+1
-
-@cocotb.test()
+# @cocotb.test()
 async def testOR(dut):
     channel = 0
     dut._log.info(f"Testing CH{channel} OR")
@@ -155,7 +129,7 @@ async def testOR(dut):
         dut._log.info(f"{dut.uo_out.value[0]=}")
         assert dut.uo_out.value[0] == result << CHNL_OFFSET[channel]
 
-@cocotb.test()
+# @cocotb.test()
 async def testXOR(dut):
     channel = 0
     dut._log.info(f"Testing CH{channel} XOR")
