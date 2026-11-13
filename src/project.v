@@ -34,6 +34,7 @@
     end
   endmodule
 
+
 module tt_um_polygate (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
@@ -45,13 +46,11 @@ module tt_um_polygate (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // Set each channel
+  // Set each channel's output
   wire ch0_out, ch1_out, ch2_out, ch3_out;
-  // wire ch0_ctrl, ch0_a, ch0_b, ch0_and, ch0_or, ch0_xor, ch0_output;
-  // reg [1:0] ch0_state;
 
 
-
+  // Instantiate each gate channel
   gate ch0 (
     .a_in(ui_in[0]),
     .b_in(ui_in[1]),
@@ -88,6 +87,8 @@ module tt_um_polygate (
     // .nout(uo_out[1])
   );
 
+
+  // Set output pins
   assign uo_out[0] = ch0_out;
   assign uo_out[1] = ~ch0_out;
 
@@ -99,42 +100,6 @@ module tt_um_polygate (
 
   assign uo_out[6] = ch3_out;
   assign uo_out[7] = ~ch3_out;
-
-  // Reset when rst_n goes low, otherwise run logic
-  // always @ (posedge clk or negedge rst_n) begin
-    // if (!rst_n) begin
-    //   ch0_state = 0;
-    
-    // // end else begin
-    // //   ch0_state = ch0_state + 1;
-    // //   if (ch0_state > 2)
-    // //     ch0_state = 0;
-      
-
-    // end
-  // end
-
-  // assign uio_out[7:6] = ch0_state;
-
-  // assign ch0_ctrl = uio_in[0];
-  // assign ch0_a = ui_in[0];
-  // assign ch0_b = ui_in[1];
-  // assign ch0_and = ch0_a & ch0_b;
-  // assign ch0_or  = ch0_a | ch0_b;
-  // assign ch0_xor = ch0_a ^ ch0_b;
-
-
-  // assign ch0 = ch0_output;
-  // assign uo_out[1:0] = {~ch0, ch0};
-
-  // assign ch1 = ui_in[2] | ui_in[3];
-  // assign uo_out[3:2] = {~ch1, ch1};
-
-  // assign ch2 = ui_in[4] ^ ui_in[5];
-  // assign uo_out[5:4] = {~ch2, ch2};
-
-  // assign ch3 = ~ui_in[6] ^ ui_in[7];
-  // assign uo_out[7:6] = {~ch3, ch3};
 
   // Set bidirectional pins to inputs for later use
   assign uio_out[7:0] = 0;
