@@ -5,6 +5,35 @@
 
 `default_nettype none
 
+  module gate (
+    input wire a_in,
+    input wire b_in,
+    input wire ctrl,
+    input wire nrst,
+    output reg out
+    // output wire nout
+  );
+    reg [1:0] state;
+
+    always @ (negedge nrst or posedge ctrl) begin
+      if (~nrst) begin
+        state <= 0;
+        out = 0;
+      end else begin
+        state <= state + 1;
+        
+        case (state)
+          0: out = b_in ? a_in : ~a_in;
+          1: out = a_in & b_in;
+          2: out = a_in | b_in;
+          3: out = a_in ^ b_in;
+        endcase
+
+        // nout = ~out;
+      end
+    end
+  endmodule
+
 module tt_um_polygate (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
@@ -17,36 +46,51 @@ module tt_um_polygate (
 );
 
   // Set each channel
-  wire ch0, ch1, ch2, ch3;
-  reg [1:0] ch0_state;
-  reg ch0_output;
+  wire ch1, ch2, ch3;
+  wire ch0_out;
+  // wire ch0_ctrl, ch0_a, ch0_b, ch0_and, ch0_or, ch0_xor, ch0_output;
+  // reg [1:0] ch0_state;
+
+
+
+  gate ch0 (
+    .a_in(ui_in[0]),
+    .b_in(ui_in[1]),
+    .ctrl(uio_in[0]),
+    .nrst(rst_n),
+    .out(ch0_out)
+    // .nout(uo_out[1])
+  );
+
+  assign uo_out[0] = ch0_out;
+  assign uo_out[1] = ~ch0_out;
 
   // Reset when rst_n goes low, otherwise run logic
-  always @ (posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
-      ch0_state = 0;
-      ch0_output = 0;
+  // always @ (posedge clk or negedge rst_n) begin
+    // if (!rst_n) begin
+    //   ch0_state = 0;
     
-    end else begin
-      if (uio_in[0] == 1)
-        ch0_state += 1;
-
-        if (ch0_state > 2)
-          ch0_state = 0;
+    // // end else begin
+    // //   ch0_state = ch0_state + 1;
+    // //   if (ch0_state > 2)
+    // //     ch0_state = 0;
       
-      case (ch0_state)
-        0: ch0_output = ui_in[0] & ui_in[1];
-        1: ch0_output = ui_in[0] | ui_in[1];
-        2: ch0_output = ui_in[0] ^ ui_in[1];
-        default: ch0_output = 0;
-      endcase
-    end
-  end
+
+    // end
+  // end
 
   // assign uio_out[7:6] = ch0_state;
 
-  assign ch0 = ch0_output;
-  assign uo_out[1:0] = {~ch0, ch0};
+  // assign ch0_ctrl = uio_in[0];
+  // assign ch0_a = ui_in[0];
+  // assign ch0_b = ui_in[1];
+  // assign ch0_and = ch0_a & ch0_b;
+  // assign ch0_or  = ch0_a | ch0_b;
+  // assign ch0_xor = ch0_a ^ ch0_b;
+
+
+  // assign ch0 = ch0_output;
+  // assign uo_out[1:0] = {~ch0, ch0};
 
   assign ch1 = ui_in[2] | ui_in[3];
   assign uo_out[3:2] = {~ch1, ch1};
@@ -62,6 +106,6 @@ module tt_um_polygate (
   assign uio_oe[7:0] = 8'b11111110;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+  wire _unused = &{ena, clk, rst_n, uio_in[7:0], 1'b0};
 
 endmodule
