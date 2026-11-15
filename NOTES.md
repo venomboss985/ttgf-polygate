@@ -38,7 +38,7 @@
 - [x] (Bug) Figure out why `test_project` test needs to run for `testAND` to pass?
 - [x] (Test) Remove the default test case when no longer needed
 - [ ] (Test) Make `setChannelFunctionFromReset()` adaptive (reads directly from chx_state)
-- [ ] (Docs) Update README
+- [*] (Docs) Update README
 
 ## Backlog
 - [ ] Generative channel block?
