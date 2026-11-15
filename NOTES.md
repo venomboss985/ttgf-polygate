@@ -2,10 +2,13 @@
 
 ## General
 * `uio_out` and `uio_in` will need to be set to 0 in the Verilog if not being utilized (depending on assignments)
+* Registers being assigned in multiple `always` blocks will not compile due to "reg begin driven by multiple drivers"
+* **NOTE: Find out why "network is combinational" error was happening**
 
 ## Testing
 * Remember to pulse a single clock cycle to "unreset" the chip
-* Remember to `await` the `reset(dut)` function (doesnt properly reset the chip otherwise)
+* Remember to `await` the `reset(...)` function (doesnt properly reset the chip otherwise)
+    * and the `setChannelFunctionFromReset(...)` too
 
 ## MVP
 * Functions as a flexible 4-channel logic gate chip
@@ -21,8 +24,10 @@
 
 ## CRITICAL
 - [x] Initial repo setup
-- [ ] (Feature) Control pin functionality
+- [x] (Feature) Control pin functionality
 - [ ] (Feature) Channel output enable functionality
+- [ ] (Test) INV gate test
+- [ ] (Test) Parallel gate tests (CH0: INV, CH1: AND, CH2: OR, CH3: XOR)
 
 ## In Progress
 - [x] Setup a test bench function for a single channel and single gate type
