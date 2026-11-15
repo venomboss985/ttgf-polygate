@@ -6,18 +6,20 @@
 `default_nettype none
 
   module gate (
-    input wire a_in,
-    input wire b_in,
-    input wire ctrl,
-    input wire oe,
-    input wire nrst,
-    output wire out,
-    output wire nout
+    input wire a_in,  // A input
+    input wire b_in,  // B input
+    input wire ctrl,  // Control line
+    input wire oe,    // Output enable
+    input wire nrst,  // Channel reset
+    output wire out,  // Output
+    output wire nout  // Not output
   );
+    // Define internal wires and registers
     wire inv_out, and_out, or_out, xor_out;
     reg [1:0] state;
     reg _out;
 
+    // Update the out_buf register with correct function (default case not needed)
     always @ (*) begin
       case (state)
         0: _out = b_in ? ~a_in : a_in;
@@ -27,14 +29,16 @@
       endcase
     end
 
+    // Reset and control pin increment logic
     always @ (negedge nrst or posedge ctrl) begin
       if (~nrst) begin
         state = 0;
       end else if (ctrl) begin
-        state = state + 1;
+        state += 1;
       end
     end
 
+    // Output from channel only if output enable is HIGH
     assign out  =  _out & oe;
     assign nout = ~_out & oe;
   endmodule
@@ -51,7 +55,7 @@ module tt_um_polygate (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // Instantiate channel 0
+  // Channel 0
   gate ch0 (
     .a_in(ui_in[0]),
     .b_in(ui_in[1]),
@@ -62,7 +66,7 @@ module tt_um_polygate (
     .nout(uo_out[1])
   );
 
-  // Instantiate channel 1
+  // Channel 1
   gate ch1 (
     .a_in(ui_in[2]),
     .b_in(ui_in[3]),
@@ -73,7 +77,7 @@ module tt_um_polygate (
     .nout(uo_out[3])
   );
 
-  // Instantiate channel 2
+  // Channel 2
   gate ch2 (
     .a_in(ui_in[4]),
     .b_in(ui_in[5]),
@@ -84,7 +88,7 @@ module tt_um_polygate (
     .nout(uo_out[5])
   );
 
-  // Instantiate channel 3
+  // Channel 3
   gate ch3 (
     .a_in(ui_in[6]),
     .b_in(ui_in[7]),
@@ -98,7 +102,7 @@ module tt_um_polygate (
 
   // Set bidirectional pins to inputs for later use
   assign uio_out[7:0] = 0;
-  assign uio_oe[7:0] = 8'b00000000;
+  assign uio_oe[7:0] = 0;
 
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, clk, rst_n, 1'b0};
