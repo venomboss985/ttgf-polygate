@@ -23,9 +23,9 @@ async def setChannelFunctionFromReset(dut, channel, func):
     
     for pulse in range(pulses):
         dut._log.info(f"pulse={pulse+1}, {channel=}")
-        dut.uio_in.value = 1 << CHNL_OFFSET[channel]
+        dut.uio_in.value = int(dut.uio_in.value) ^ (1 << CHNL_OFFSET[channel])
         await ClockCycles(dut.clk, 1)
-        dut.uio_in.value = 0 << CHNL_OFFSET[channel]
+        dut.uio_in.value = int(dut.uio_in.value) ^ (1 << CHNL_OFFSET[channel])
         await ClockCycles(dut.clk, 1)
 
 async def reset(dut):
@@ -83,6 +83,8 @@ async def testAND(dut):
     cocotb.start_soon(clock.start())
 
     await reset(dut)
+    # Set output enable to always on
+    dut.uio_in.value = 0b11110000
 
     await ClockCycles(dut.clk, 1)
     
@@ -115,6 +117,8 @@ async def testOR(dut):
     cocotb.start_soon(clock.start())
 
     await reset(dut)
+    # Set output enable to always on
+    dut.uio_in.value = 0b11110000
 
     await ClockCycles(dut.clk, 1)
     
@@ -130,7 +134,7 @@ async def testOR(dut):
                 
         result = (res << CHNL_OFFSET[channel]) | (n_res << CHNL_OFFSET[channel]+1)
         
-        dut._log.info(f"{A=} | {B=} = {result}")
+        dut._log.info(f"{A=} | {B=} = {result:02b}")
         dut._log.info(f"{CHNL_OFFSET[channel]=}")
         
         dut.ui_in.value = check << CHNL_OFFSET[channel]
@@ -147,6 +151,8 @@ async def testXOR(dut):
     cocotb.start_soon(clock.start())
 
     await reset(dut)
+    # Set output enable to always on
+    dut.uio_in.value = 0b11110000
 
     await ClockCycles(dut.clk, 1)
     
@@ -162,7 +168,7 @@ async def testXOR(dut):
                 
         result = (res << CHNL_OFFSET[channel]) | (n_res << CHNL_OFFSET[channel]+1)
         
-        dut._log.info(f"{A=} ^ {B=} = {result}")
+        dut._log.info(f"{A=} ^ {B=} = {result:02b}")
         dut._log.info(f"{CHNL_OFFSET[channel]=}")
         
         dut.ui_in.value = check << CHNL_OFFSET[channel]

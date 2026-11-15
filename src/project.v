@@ -9,6 +9,7 @@
     input wire a_in,
     input wire b_in,
     input wire ctrl,
+    input wire oe,
     input wire nrst,
     output wire out,
     output wire nout
@@ -34,8 +35,8 @@
       end
     end
 
-    assign out = _out;
-    assign nout = ~_out;
+    assign out  =  _out & oe;
+    assign nout = ~_out & oe;
   endmodule
 
 
@@ -55,6 +56,7 @@ module tt_um_polygate (
     .a_in(ui_in[0]),
     .b_in(ui_in[1]),
     .ctrl(uio_in[0]),
+    .oe(uio_in[4]),
     .nrst(rst_n),
     .out(uo_out[0]),
     .nout(uo_out[1])
@@ -65,6 +67,7 @@ module tt_um_polygate (
     .a_in(ui_in[2]),
     .b_in(ui_in[3]),
     .ctrl(uio_in[1]),
+    .oe(uio_in[5]),
     .nrst(rst_n),
     .out(uo_out[2]),
     .nout(uo_out[3])
@@ -75,6 +78,7 @@ module tt_um_polygate (
     .a_in(ui_in[4]),
     .b_in(ui_in[5]),
     .ctrl(uio_in[2]),
+    .oe(uio_in[6]),
     .nrst(rst_n),
     .out(uo_out[4]),
     .nout(uo_out[5])
@@ -85,6 +89,7 @@ module tt_um_polygate (
     .a_in(ui_in[6]),
     .b_in(ui_in[7]),
     .ctrl(uio_in[3]),
+    .oe(uio_in[7]),
     .nrst(rst_n),
     .out(uo_out[6]),
     .nout(uo_out[7])
@@ -93,9 +98,9 @@ module tt_um_polygate (
 
   // Set bidirectional pins to inputs for later use
   assign uio_out[7:0] = 0;
-  assign uio_oe[7:0] = 8'b11110000;
+  assign uio_oe[7:0] = 8'b00000000;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, uio_in[7:4], 1'b0};
+  wire _unused = &{ena, clk, rst_n, 1'b0};
 
 endmodule

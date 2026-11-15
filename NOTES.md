@@ -25,9 +25,9 @@
 ## CRITICAL
 - [x] Initial repo setup
 - [x] (Feature) Control pin functionality
-- [ ] (Feature) Channel output enable functionality
+- [x] (Feature) Channel output enable functionality
 - [ ] (Test) INV gate test
-- [ ] (Test) Parallel gate tests (CH0: INV, CH1: AND, CH2: OR, CH3: XOR)
+- [ ] (Test) Parallel gate tests (CH0: INV, CH1: AND, CH2: OR, CH3: XOR) with individual OE toggle
 
 ## In Progress
 - [x] Setup a test bench function for a single channel and single gate type
