@@ -13,13 +13,13 @@
 
 ## MVP
 * Functions as a flexible 4-channel logic gate chip
-* Each channel is individually configurable with a dedicated output enable
+* Each channel is individually configurable with a dedicated control pin and output enable
 * Channel functions include:
   * INV
   * AND
   * OR
   * XOR
-* Functions are cycled by signaling HIGH on the channel control pin while `clk` is HIGH
+* Functions are cycled by signaling HIGH on the channel control pin rising edge
 * Outputs include Q and nQ
 
 # TODO
@@ -29,24 +29,25 @@
 - [x] (Feature) Control pin functionality
 - [x] (Feature) Channel output enable functionality
 - [x] (Test) INV gate test
+- [ ] (Test) Control pin overflow test (CH0 cycles through all the functions and verifies it can return back to INV and function correctly without resetting)
 - [ ] (Test) Parallel gate tests (CH0: INV, CH1: AND, CH2: OR, CH3: XOR) with individual OE toggle
 
 ## In Progress
 - [x] Setup a test bench function for a single channel and single gate type
-- [ ] (Test) Change channel function test to test all gate functions
 - [x] (Bug) Figure out why `test_project` test needs to run for `testAND` to pass?
-- [ ] (Test) Create test case list
 - [x] (Test) Remove the default test case when no longer needed
-- [ ] (Test) Make `setChannelFunctionFromReset()` adaptive (reads from chx_state)
-- [ ] (Test) Make a parallelized version of `setChannelFunctionFromReset()` (to set multiple channels at once simultaneously)
+- [ ] (Test) Make `setChannelFunctionFromReset()` adaptive (reads directly from chx_state)
 - [ ] (Docs) Update README
 
 ## Backlog
-- [ ] Generative channel block
-- [ ] Gate-level testing
+- [ ] Generative channel block?
+- [x] Gate-level testing? (tested and worked, but don't really know how to interpret the results)
 - [ ] Extensive docs
 
 ## Revisit
 
 ## Retired
+- [ ] ~~(Test) Change channel function test to test all gate functions~~ (new parallel gate test)
+- [ ] ~~(Test) Create test case list~~ (only need a couple more tests, so planning list is unnecessary atp)
+- [ ] ~~(Test) Make a parallelized version of `setChannelFunctionFromReset()` (to set multiple channels at once simultaneously)~~ (parallel gate test)
 * `ctypes` not needed, just had to get better at bit-masking...
