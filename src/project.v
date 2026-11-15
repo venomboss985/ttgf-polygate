@@ -10,8 +10,8 @@
     input wire b_in,
     input wire ctrl,
     input wire nrst,
-    output wire out
-    // output wire nout
+    output wire out,
+    output wire nout
   );
     wire inv_out, and_out, or_out, xor_out;
     reg [1:0] state;
@@ -19,10 +19,10 @@
 
     always @ (*) begin
       case (state)
-        0: _out = inv_out;
-        1: _out = and_out;
-        2: _out = or_out;
-        3: _out = xor_out;
+        0: _out = b_in ? ~a_in : a_in;
+        1: _out = a_in & b_in;
+        2: _out = a_in | b_in;
+        3: _out = a_in ^ b_in;
       endcase
     end
 
@@ -32,15 +32,10 @@
       end else if (ctrl) begin
         state = state + 1;
       end
-        // nout = ~out;
     end
 
-    assign inv_out = b_in ? ~a_in : a_in;
-    assign and_out = a_in & b_in;
-    assign  or_out = a_in | b_in;
-    assign xor_out = a_in ^ b_in;
-
     assign out = _out;
+    assign nout = ~_out;
   endmodule
 
 
@@ -55,60 +50,46 @@ module tt_um_polygate (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // Set each channel's output
-  wire ch0_out, ch1_out, ch2_out, ch3_out;
-
-
-  // Instantiate each gate channel
+  // Instantiate channel 0
   gate ch0 (
     .a_in(ui_in[0]),
     .b_in(ui_in[1]),
     .ctrl(uio_in[0]),
     .nrst(rst_n),
-    .out(ch0_out)
-    // .nout(uo_out[1])
+    .out(uo_out[0]),
+    .nout(uo_out[1])
   );
 
+  // Instantiate channel 1
   gate ch1 (
     .a_in(ui_in[2]),
     .b_in(ui_in[3]),
     .ctrl(uio_in[1]),
     .nrst(rst_n),
-    .out(ch1_out)
-    // .nout(uo_out[1])
+    .out(uo_out[2]),
+    .nout(uo_out[3])
   );
 
+  // Instantiate channel 2
   gate ch2 (
     .a_in(ui_in[4]),
     .b_in(ui_in[5]),
     .ctrl(uio_in[2]),
     .nrst(rst_n),
-    .out(ch2_out)
-    // .nout(uo_out[1])
+    .out(uo_out[4]),
+    .nout(uo_out[5])
   );
 
+  // Instantiate channel 3
   gate ch3 (
     .a_in(ui_in[6]),
     .b_in(ui_in[7]),
     .ctrl(uio_in[3]),
     .nrst(rst_n),
-    .out(ch3_out)
-    // .nout(uo_out[1])
+    .out(uo_out[6]),
+    .nout(uo_out[7])
   );
 
-
-  // Set output pins
-  assign uo_out[0] = ch0_out;
-  assign uo_out[1] = ~ch0_out;
-
-  assign uo_out[2] = ch1_out;
-  assign uo_out[3] = ~ch1_out;
-
-  assign uo_out[4] = ch2_out;
-  assign uo_out[5] = ~ch2_out;
-
-  assign uo_out[6] = ch3_out;
-  assign uo_out[7] = ~ch3_out;
 
   // Set bidirectional pins to inputs for later use
   assign uio_out[7:0] = 0;
