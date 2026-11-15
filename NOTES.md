@@ -4,6 +4,7 @@
 * `uio_out` and `uio_in` will need to be set to 0 in the Verilog if not being utilized (depending on assignments)
 * Registers being assigned in multiple `always` blocks will not compile due to "reg begin driven by multiple drivers"
 * **NOTE: Find out why "network is combinational" error was happening**
+* Cell and wire information is found in `runs/wokwi/06-yosys-synthesis/yosys-synthesis.log`
 
 ## Testing
 * Remember to pulse a single clock cycle to "unreset" the chip
