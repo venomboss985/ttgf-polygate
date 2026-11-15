@@ -10,28 +10,37 @@
     input wire b_in,
     input wire ctrl,
     input wire nrst,
-    output reg out
+    output wire out
     // output wire nout
   );
+    wire inv_out, and_out, or_out, xor_out;
     reg [1:0] state;
+    reg _out;
+
+    always @ (*) begin
+      case (state)
+        0: _out = inv_out;
+        1: _out = and_out;
+        2: _out = or_out;
+        3: _out = xor_out;
+      endcase
+    end
 
     always @ (negedge nrst or posedge ctrl) begin
       if (~nrst) begin
-        state <= 0;
-        out <= 0;
-      end else begin
-        state <= state + 1;
-        
-        case (state)
-          0: out <= b_in ? a_in : ~a_in;
-          1: out <= a_in & b_in;
-          2: out <= a_in | b_in;
-          3: out <= a_in ^ b_in;
-        endcase
-
-        // nout = ~out;
+        state = 0;
+      end else if (ctrl) begin
+        state = state + 1;
       end
+        // nout = ~out;
     end
+
+    assign inv_out = b_in ? ~a_in : a_in;
+    assign and_out = a_in & b_in;
+    assign  or_out = a_in | b_in;
+    assign xor_out = a_in ^ b_in;
+
+    assign out = _out;
   endmodule
 
 
@@ -103,9 +112,9 @@ module tt_um_polygate (
 
   // Set bidirectional pins to inputs for later use
   assign uio_out[7:0] = 0;
-  assign uio_oe[7:0] = 8'b11111110;
+  assign uio_oe[7:0] = 8'b11110000;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, uio_in[7:0], 1'b0};
+  wire _unused = &{ena, clk, rst_n, uio_in[7:4], 1'b0};
 
 endmodule

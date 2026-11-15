@@ -9,18 +9,24 @@ CHNL_OFFSET = [0, 2, 4, 6]
 
 # Pulse control pin to set channel function
 async def setChannelFunctionFromReset(dut, channel, func):
-    dut.uio_in.value = 1 << CHNL_OFFSET[channel]
+    dut._log.info(f"Setting CH{channel} to {func}")
     
     pulses = 0
     match (func):
-        case "AND": pulses = 0
-        case "OR" : pulses = 1
-        case "XOR": pulses = 2
+        case "INV": pulses = 0
+        case "AND": pulses = 1
+        case "OR" : pulses = 2
+        case "XOR": pulses = 3
+        case _: dut._log.info(f"INVALID FUNCTION={func}"); pulses = -1
 
-    assert pulses == 0 or pulses < 3
-    await ClockCycles(dut.clk, pulses+1)
+    assert pulses >= 0 and pulses <= 3
     
-    dut.uio_in.value = 0 << CHNL_OFFSET[channel]
+    for pulse in range(pulses):
+        dut._log.info(f"pulse={pulse+1}, {channel=}")
+        dut.uio_in.value = 1 << CHNL_OFFSET[channel]
+        await ClockCycles(dut.clk, 1)
+        dut.uio_in.value = 0 << CHNL_OFFSET[channel]
+        await ClockCycles(dut.clk, 1)
 
 async def reset(dut):
     # Reset
@@ -80,7 +86,7 @@ async def testAND(dut):
 
     await ClockCycles(dut.clk, 1)
     
-    setChannelFunctionFromReset(dut, channel, "AND")
+    await setChannelFunctionFromReset(dut, channel, 'AND')
 
     # Input incrementer
     for check in range(4):
@@ -96,11 +102,11 @@ async def testAND(dut):
         dut._log.info(f"{CHNL_OFFSET[channel]=}")
         
         dut.ui_in.value = check << CHNL_OFFSET[channel]
-        await ClockCycles(dut.clk, 2)
+        await ClockCycles(dut.clk, 1)
         dut._log.info(f"{dut.uo_out.value=}")
-        assert int(dut.uo_out.value) & 0b11 << CHNL_OFFSET[channel] == result << CHNL_OFFSET[channel]
+        assert int(dut.uo_out.value) & (0b11 << CHNL_OFFSET[channel]) == (result << CHNL_OFFSET[channel])
 
-# @cocotb.test()
+@cocotb.test()
 async def testOR(dut):
     channel = 0
     dut._log.info(f"Testing CH{channel} OR")
@@ -112,24 +118,27 @@ async def testOR(dut):
 
     await ClockCycles(dut.clk, 1)
     
-    setChannelFunctionFromReset(dut, channel, "OR")
+    await setChannelFunctionFromReset(dut, channel, 'OR')
 
     # Input incrementer
     for check in range(4):
         value = f"{check:02b}"
         A = int(value[-1])
         B = int(value[ 0])
-        result = A | B
+        res = A | B
+        n_res = ~(A | B) & 0b1
+                
+        result = (res << CHNL_OFFSET[channel]) | (n_res << CHNL_OFFSET[channel]+1)
         
         dut._log.info(f"{A=} | {B=} = {result}")
         dut._log.info(f"{CHNL_OFFSET[channel]=}")
         
         dut.ui_in.value = check << CHNL_OFFSET[channel]
-        await ClockCycles(dut.clk, 2)
-        dut._log.info(f"{dut.uo_out.value[0]=}")
-        assert dut.uo_out.value[0] == result << CHNL_OFFSET[channel]
+        await ClockCycles(dut.clk, 1)
+        dut._log.info(f"{dut.uo_out.value=}")
+        assert int(dut.uo_out.value) & (0b11 << CHNL_OFFSET[channel]) == (result << CHNL_OFFSET[channel])
 
-# @cocotb.test()
+@cocotb.test()
 async def testXOR(dut):
     channel = 0
     dut._log.info(f"Testing CH{channel} XOR")
@@ -141,19 +150,22 @@ async def testXOR(dut):
 
     await ClockCycles(dut.clk, 1)
     
-    setChannelFunctionFromReset(dut, channel, "XOR")
+    await setChannelFunctionFromReset(dut, channel, 'XOR')
 
     # Input incrementer
     for check in range(4):
         value = f"{check:02b}"
         A = int(value[-1])
         B = int(value[ 0])
-        result = A ^ B
+        res = A ^ B
+        n_res = ~(A ^ B) & 0b1
+                
+        result = (res << CHNL_OFFSET[channel]) | (n_res << CHNL_OFFSET[channel]+1)
         
         dut._log.info(f"{A=} ^ {B=} = {result}")
         dut._log.info(f"{CHNL_OFFSET[channel]=}")
         
         dut.ui_in.value = check << CHNL_OFFSET[channel]
-        await ClockCycles(dut.clk, 2)
+        await ClockCycles(dut.clk, 1)
         dut._log.info(f"{dut.uo_out.value[0]=}")
-        assert dut.uo_out.value[0] == result << CHNL_OFFSET[channel]
+        assert int(dut.uo_out.value) & (0b11 << CHNL_OFFSET[channel]) == (result << CHNL_OFFSET[channel])
