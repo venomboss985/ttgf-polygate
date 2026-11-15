@@ -75,6 +75,40 @@ async def testReset(dut):
     dut._log.info(f"Finished reset")
 
 @cocotb.test()
+async def testINV(dut):
+    channel = 0
+    dut._log.info(f"Testing CH{channel} INV")
+
+    clock = Clock(dut.clk, 10, unit='us')
+    cocotb.start_soon(clock.start())
+
+    await reset(dut)
+    # Set output enable to always on
+    dut.uio_in.value = 0b11110000
+
+    await ClockCycles(dut.clk, 1)
+    
+    await setChannelFunctionFromReset(dut, channel, 'INV')
+
+    # Input incrementer
+    for check in range(4):
+        value = f"{check:02b}"
+        A = int(value[-1])
+        B = int(value[ 0])
+        res = A if ~B & 0b1 else ~A & 0b1
+        n_res = ~(res) & 0b1
+        
+        result = (res << CHNL_OFFSET[channel]) | (n_res << CHNL_OFFSET[channel]+1)
+        
+        dut._log.info(f"{A=} ~ {~B=} = {result:02b}")
+        dut._log.info(f"{CHNL_OFFSET[channel]=}")
+        
+        dut.ui_in.value = check << CHNL_OFFSET[channel]
+        await ClockCycles(dut.clk, 1)
+        dut._log.info(f"{dut.uo_out.value=}")
+        assert int(dut.uo_out.value) & (0b11 << CHNL_OFFSET[channel]) == (result << CHNL_OFFSET[channel])
+
+@cocotb.test()
 async def testAND(dut):
     channel = 0
     dut._log.info(f"Testing CH{channel} AND")
@@ -96,7 +130,7 @@ async def testAND(dut):
         A = int(value[-1])
         B = int(value[ 0])
         res = (A & B)
-        n_res = ~(A & B) & 0b1
+        n_res = ~(res) & 0b1
         
         result = (res << CHNL_OFFSET[channel]) | (n_res << CHNL_OFFSET[channel]+1)
         
@@ -130,8 +164,8 @@ async def testOR(dut):
         A = int(value[-1])
         B = int(value[ 0])
         res = A | B
-        n_res = ~(A | B) & 0b1
-                
+        n_res = ~(res) & 0b1
+
         result = (res << CHNL_OFFSET[channel]) | (n_res << CHNL_OFFSET[channel]+1)
         
         dut._log.info(f"{A=} | {B=} = {result:02b}")
@@ -164,8 +198,8 @@ async def testXOR(dut):
         A = int(value[-1])
         B = int(value[ 0])
         res = A ^ B
-        n_res = ~(A ^ B) & 0b1
-                
+        n_res = ~(res) & 0b1
+        
         result = (res << CHNL_OFFSET[channel]) | (n_res << CHNL_OFFSET[channel]+1)
         
         dut._log.info(f"{A=} ^ {B=} = {result:02b}")

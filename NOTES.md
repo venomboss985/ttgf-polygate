@@ -8,15 +8,17 @@
 ## Testing
 * Remember to pulse a single clock cycle to "unreset" the chip
 * Remember to `await` the `reset(...)` function (doesnt properly reset the chip otherwise)
-    * and the `setChannelFunctionFromReset(...)` too
+  * and the `setChannelFunctionFromReset(...)` too
+* Gate level worked after running `ciel ls` and `ciel enable <hash from ls>`, but not sure how to interpret results?
 
 ## MVP
 * Functions as a flexible 4-channel logic gate chip
 * Each channel is individually configurable with a dedicated output enable
 * Channel functions include:
-    * AND
-    * OR
-    * XOR
+  * INV
+  * AND
+  * OR
+  * XOR
 * Functions are cycled by signaling HIGH on the channel control pin while `clk` is HIGH
 * Outputs include Q and nQ
 
@@ -26,7 +28,7 @@
 - [x] Initial repo setup
 - [x] (Feature) Control pin functionality
 - [x] (Feature) Channel output enable functionality
-- [ ] (Test) INV gate test
+- [x] (Test) INV gate test
 - [ ] (Test) Parallel gate tests (CH0: INV, CH1: AND, CH2: OR, CH3: XOR) with individual OE toggle
 
 ## In Progress
