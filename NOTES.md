@@ -5,6 +5,7 @@
 * Registers being assigned in multiple `always` blocks will not compile due to "reg begin driven by multiple drivers"
 * **NOTE: Find out why "network is combinational" error was happening**
 * Cell and wire information is found in `runs/wokwi/06-yosys-synthesis/yosys-synthesis.log`
+* Sign in then push to GitHub (idk why its being weird like that), if you push *even once* then sign in, subsequent push attempts will result in "Temporary failure in name resolution"
 
 ## Testing
 * Remember to pulse a single clock cycle to "unreset" the chip
